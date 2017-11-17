@@ -46,8 +46,12 @@ public class UpdateChecker {
     private int progress;
 
     private File apkFile;
+    //新版本保存文件名
+    public static String apkFileName = "app.apk";
 
     private boolean showAlert = true;//是否显示新本版alert。默认显示
+    //检查更新后，判断当前已是最新版本时的提示消息
+    private String checkMessage = "当前已是最新版本";
 
     private Handler handler;
 
@@ -85,20 +89,22 @@ public class UpdateChecker {
         }
         final Handler handler = new Handler(){
             public void handleMessage(Message msg) {
-                if (msg.what == 1) {
+                if (msg.what == AppVersion.CONNECTSUCCESS) {
                     mAppVersion = (AppVersion) msg.obj;
                     try{
                         int versionCode = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0).versionCode;
-                        Log.d(TAG,"mAppVersion = " + mAppVersion);
                         Log.d(TAG,"versionCode = " + versionCode);
                         if (mAppVersion.getApkCode() > versionCode) {
                             showUpdateDialog();
+                        }else{
+                            sendResult();
                         }
                     }catch (PackageManager.NameNotFoundException ignored){
                     }
                 }
             }
         };
+        //检查服务端版本信息
         mThread = new Thread() {
             @Override
             public void run() {
@@ -106,8 +112,9 @@ public class UpdateChecker {
                 Message msg = new Message();
                 String json = sendPost();
                 if(json!=null){
+                    //服务端版本信息获取成功后，发送Message
                     AppVersion appVersion = parseJson(json);
-                    msg.what = 1;
+                    msg.what = AppVersion.CONNECTSUCCESS;
                     msg.obj = appVersion;
                     handler.sendMessage(msg);
                 }else{
@@ -117,6 +124,11 @@ public class UpdateChecker {
         };
         mThread.start();
     }
+
+    /**
+     * 请求服务端版本信息
+     * @return
+     */
     protected String sendPost() {
         HttpURLConnection uRLConnection = null;
         InputStream is = null;
@@ -139,6 +151,7 @@ public class UpdateChecker {
                 inStream.close();
                 result = new String(outStream.toByteArray());//通过out.Stream.toByteArray获取到写的数据
             }else{
+                //服务端版本文件请求失败，发送Message
                 Message message1 = new Message();
                 message1.what = AppVersion.CONNECTFAILED;
                 message1.obj = "请求错误：code:" + code + "message:"+message;
@@ -188,7 +201,7 @@ public class UpdateChecker {
     }
 
     public void showUpdateDialog() {
-        //更新首页版本提示
+        //服务端有新版本，发布新版本Message
         Message message = new Message();
         message.what = AppVersion.NEW_VERSION;
         message.obj = mAppVersion.getApkCode();
@@ -260,7 +273,7 @@ public class UpdateChecker {
                     if (!file.exists()){
                         file.mkdir();
                     }
-                    File apkFile = new File(mSavePath, AppVersion.APK_FILENAME);
+                    File apkFile = new File(mSavePath, UpdateChecker.apkFileName);
                     FileOutputStream fos = new FileOutputStream(apkFile);
                     int count = 0;
                     // 缓存
@@ -297,22 +310,32 @@ public class UpdateChecker {
      * 安装APK文件
      */
     private void installApk(){
-        File apkfile = new File(mSavePath, AppVersion.APK_FILENAME);
+        File apkfile = new File(mSavePath, UpdateChecker.apkFileName);
         if (!apkfile.exists()){
             return;
         }
-        Log.d(TAG,"mSavePath = " + mSavePath + "/" + AppVersion.APK_FILENAME);
+        Log.d(TAG,"mSavePath = " + mSavePath + "/" + UpdateChecker.apkFileName);
         try{
             Intent i = new Intent(Intent.ACTION_VIEW);
-            String filePath = mSavePath + "/" + AppVersion.APK_FILENAME;
+            String filePath = mSavePath + "/" + UpdateChecker.apkFileName;
             Log.d(TAG,"filePath = " + filePath);
             i.setDataAndType(Uri.parse("file://" + filePath), "application/vnd.android.package-archive");
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(i);
         }catch (Exception e){
             e.printStackTrace();
-            Toast.makeText(mContext,"安装失败，请在文件管理器中找到chpcydebug.apk进行安装。",Toast.LENGTH_LONG);
+            Toast.makeText(mContext,"安装失败，请在文件管理器中找到"+UpdateChecker.apkFileName+"安装进行安装。",Toast.LENGTH_LONG);
         }
+    }
+
+    /**
+     * 当前已是最新，发布Message
+     */
+    private void sendResult(){
+        Message message = new Message();
+        message.what = AppVersion.ALREADY_NEW;
+        message.obj = checkMessage;
+        handler.sendMessage(message);
     }
 
     public boolean isShowAlert() {
@@ -321,6 +344,14 @@ public class UpdateChecker {
 
     public void setShowAlert(boolean showAlert) {
         this.showAlert = showAlert;
+    }
+
+    public String getCheckMessage() {
+        return checkMessage;
+    }
+
+    public void setCheckMessage(String checkMessage) {
+        this.checkMessage = checkMessage;
     }
 }
 
