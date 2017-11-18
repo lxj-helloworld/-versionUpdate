@@ -70,6 +70,28 @@ Step 2. Add the dependency:
 
 
 
+4、服务端版本文件编写示例：
+
+
+{
+    "url":"http://www.topscomm.com:5000/app_download/package/chpcyDebug/chpcy_2017_10_27_02.apk",
+    "versionCode":"12",
+    versionName:"1.2",
+    "installNow":"0",
+    "updateMessage":"1、修复电脑访问日志文件时，必须重启手机的问题。"
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
