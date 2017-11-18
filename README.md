@@ -62,7 +62,7 @@ Step 2. Add the dependency:
             //新版本保存文件名
             UpdateChecker.apkFileName = "newVersion.apk";
             UpdateChecker updateChecker = new UpdateChecker(UpdateVersionActivity.this,handler);
-            String checkUrl = "http://www.topscomm.com:5000/app_download/package/chpcyDebug/update.json" + "?t="+System.currentTimeMillis();
+            String checkUrl = "http://...../update.json" + "?t="+System.currentTimeMillis();
             updateChecker.setCheckUrl(checkUrl); //设置版本号查询地址
             updateChecker.setShowAlert(true); //设置是否显示警示框
             updateChecker.setCheckMessage("已是最新");
