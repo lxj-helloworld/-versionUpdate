@@ -74,7 +74,7 @@ Step 2. Add the dependency:
 
 
 {
-    "url":"http://www.topscomm.com:5000/app_download/package/chpcyDebug/chpcy_2017_10_27_02.apk",
+    "url":"http://..../chpcy_2017_10_27_02.apk",
     "versionCode":"12",
     versionName:"1.2",
     "installNow":"0",
