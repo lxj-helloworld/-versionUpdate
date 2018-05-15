@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             updateChecker.setCheckUrl(checkUrl); //设置版本号查询地址
             updateChecker.setShowAlert(true); //设置是否显示警示框
             updateChecker.setCheckMessage("已是最新");
+//            updateChecker.setSysDown (true); //启用系统下载
             updateChecker.checkForUpdates(); //开始检查
         }
     }

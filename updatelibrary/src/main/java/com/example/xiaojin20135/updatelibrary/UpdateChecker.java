@@ -1,5 +1,6 @@
 package com.example.xiaojin20135.updatelibrary;
 
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -56,6 +57,8 @@ public class UpdateChecker {
     private String checkMessage = "当前已是最新版本";
 
     private Handler handler;
+
+    private boolean sysDown = false;//启动系统下载器
 
     public void setCheckUrl(String url) {
         mCheckUrl = url;
@@ -246,9 +249,22 @@ public class UpdateChecker {
         String filename = apkUrl.substring(apkUrl.lastIndexOf("/"),apkUrl.length());
         String destinationFilePath =  dir + "/" + filename;
         apkFile = new File(destinationFilePath);
-        mProgressDialog.show();
-        // 启动新线程下载软件
-        new downloadApkThread().start();
+//
+        if(sysDown){
+            //创建下载任务,downloadUrl就是下载链接
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(apkUrl));
+            //指定下载路径和下载文件名
+            request.setDestinationInExternalPublicDir(dir + "/topscomm/", filename);
+            //获取下载管理器
+            DownloadManager downloadManager= (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
+            //将下载任务加入下载队列，否则不会进行下载
+            downloadManager.enqueue(request);
+        }else{
+            mProgressDialog.show();
+            // 启动新线程下载软件
+            new downloadApkThread().start();
+        }
+
     }
     /**
      * 下载文件线程
@@ -261,7 +277,7 @@ public class UpdateChecker {
                 if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
                     // 获得存储卡的路径
                     String sdpath = Environment.getExternalStorageDirectory() + "/";
-                    mSavePath = sdpath + "download";
+                    mSavePath = sdpath;
                     URL url = new URL(mAppVersion.getApkUrl());
                     // 创建连接
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -317,13 +333,6 @@ public class UpdateChecker {
             return;
         }
         Log.d(TAG,"mSavePath = " + mSavePath + "/" + AppVersion.APK_FILENAME);
-       /* // 通过Intent安装APK文件
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse("file://" + apkfile.toString()), "application/vnd.android.package-archive");
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        mContext.startActivity(intent);*/
-
         try{
             Intent i = new Intent(Intent.ACTION_VIEW);
             String filePath = mSavePath + "/" + AppVersion.APK_FILENAME;
@@ -334,9 +343,9 @@ public class UpdateChecker {
             }else{
                 uri = Uri.fromFile(new File (filePath));
             }
-
             i.setDataAndType(uri, "application/vnd.android.package-archive");
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.addCategory("android.intent.category.DEFAULT");
+            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             mContext.startActivity(i);
         }catch (Exception e){
             e.printStackTrace();
@@ -374,6 +383,14 @@ public class UpdateChecker {
 
     public void setCheckMessage(String checkMessage) {
         this.checkMessage = checkMessage;
+    }
+
+    public boolean isSysDown () {
+        return sysDown;
+    }
+
+    public void setSysDown (boolean sysDown) {
+        this.sysDown = sysDown;
     }
 }
 
