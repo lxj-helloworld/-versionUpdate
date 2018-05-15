@@ -6,9 +6,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
@@ -310,22 +312,42 @@ public class UpdateChecker {
      * 安装APK文件
      */
     private void installApk(){
-        File apkfile = new File(mSavePath, UpdateChecker.apkFileName);
+        File apkfile = new File(mSavePath, AppVersion.APK_FILENAME);
         if (!apkfile.exists()){
             return;
         }
-        Log.d(TAG,"mSavePath = " + mSavePath + "/" + UpdateChecker.apkFileName);
+        Log.d(TAG,"mSavePath = " + mSavePath + "/" + AppVersion.APK_FILENAME);
+       /* // 通过Intent安装APK文件
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.parse("file://" + apkfile.toString()), "application/vnd.android.package-archive");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        mContext.startActivity(intent);*/
+
         try{
             Intent i = new Intent(Intent.ACTION_VIEW);
-            String filePath = mSavePath + "/" + UpdateChecker.apkFileName;
+            String filePath = mSavePath + "/" + AppVersion.APK_FILENAME;
             Log.d(TAG,"filePath = " + filePath);
-            i.setDataAndType(Uri.parse("file://" + filePath), "application/vnd.android.package-archive");
+            Uri uri;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {//如果是7.0android系统
+                uri = FileProvider.getUriForFile(mContext, "com.example.xiaojin20135.updatelibrary.fileprovider", new File (filePath));
+            }else{
+                uri = Uri.fromFile(new File (filePath));
+            }
+
+            i.setDataAndType(uri, "application/vnd.android.package-archive");
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(i);
         }catch (Exception e){
             e.printStackTrace();
-            Toast.makeText(mContext,"安装失败，请在文件管理器中找到"+UpdateChecker.apkFileName+"安装进行安装。",Toast.LENGTH_LONG);
+            Toast.makeText(mContext,"安装失败，请在文件管理器中找到"+AppVersion.APK_FILENAME+"进行安装。",Toast.LENGTH_LONG);
         }
+        /*Uri uri = Uri.fromFile(new File(mSavePath,AppVersion.APK_FILENAME));
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.putExtra("Intent.ACTION_PACKAGE_REPLACED", "com.example.xiaojin20135.topscomm.chpcydebug.activity");
+        intent.setDataAndType(uri, "application/vnd.android.package-archive");
+        mContext.startActivity(intent);*/
+
     }
 
     /**

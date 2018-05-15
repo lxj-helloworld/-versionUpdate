@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-              package="com.example.xiaojin20135.versionupdate">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.xiaojin20135.versionupdate">
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER"/>
     <!-- 常规权限 -->
     <!-- 网络访问 -->
@@ -28,6 +29,7 @@
                     <category android:name="android.intent.category.LAUNCHER"/>
                 </intent-filter>
         </activity>
+
         </application>
 
     </manifest>

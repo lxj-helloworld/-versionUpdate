@@ -19,6 +19,7 @@ public class AppVersion {
     public static final int CONNECTSUCCESS = 102; //服务端版本文件下载成功
     public static final int NEW_VERSION = 103; //发现新版本
     public static final int ALREADY_NEW = 104;//当前已是最新版本
+    public static final String APK_FILENAME = "newVersion.apk";
 
 
 
