@@ -1,22 +1,20 @@
 package com.example.xiaojin20135.versionupdate;
 
-import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import com.example.xiaojin20135.updatelibrary.AppVersion;
-import com.example.xiaojin20135.updatelibrary.CheckActivity;
 import com.example.xiaojin20135.updatelibrary.UpdateChecker;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-    private static final String TAG = "MainActivity";
+public class MiniActivity extends AppCompatActivity {
+    private static final String TAG = "MiniActivity";
 
     private TextView check_result_Tv;
+
     //声明Handler对象，接收版本号检查结果
     private Handler handler = new Handler(){
         @Override
@@ -36,30 +34,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     };
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        check_result_Tv = (TextView)findViewById(R.id.check_result_Tv);
-    }
+    protected void onCreate (Bundle savedInstanceState) {
+        super.onCreate (savedInstanceState);
+        setContentView (R.layout.activity_mini);
+        check_result_Tv = (TextView)findViewById (R.id.check_result_Tv);
 
-
-    @Override
-    public void onClick(View v) {
-        if(v.getId() == R.id.check_btn){
-            Intent intent = new Intent (MainActivity.this,CheckActivity.class);
-            startActivity (intent);
-
-
-          /*  UpdateChecker.apkFileName = "newVersion.apk"; //新版本保存文件名
-            UpdateChecker updateChecker = new UpdateChecker(MainActivity.this,handler);
-            String checkUrl = "http://www.topscomm.com:5000/app_download/package/topsRmsNew/update.json" + "?t="+System.currentTimeMillis();
-            updateChecker.setCheckUrl(checkUrl); //设置版本号查询地址
-            updateChecker.setShowAlert(true); //设置是否显示警示框
-            updateChecker.setCheckMessage("已是最新");
+        UpdateChecker.apkFileName = "newVersion.apk"; //新版本保存文件名
+        UpdateChecker updateChecker = new UpdateChecker(MiniActivity.this,handler);
+        String checkUrl = "http://www.topscomm.com:5000/app_download/package/topsRmsNew/update.json" + "?t="+System.currentTimeMillis();
+        updateChecker.setCheckUrl(checkUrl); //设置版本号查询地址
+        updateChecker.setShowAlert(true); //设置是否显示警示框
+        updateChecker.setCheckMessage("已是最新");
 //            updateChecker.setSysDown (true); //启用系统下载
-            updateChecker.checkForUpdates(); //开始检查*/
-        }
+        updateChecker.checkForUpdates(); //开始检查
+        Log.d (TAG,"checkForUpdates ");
     }
 }
