@@ -1,5 +1,6 @@
 package com.example.xiaojin20135.updatelibrary;
 
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -229,7 +230,7 @@ public class UpdateChecker {
                 builder.setNegativeButton("下次",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-
+                                ((Activity)mContext).finish ();
                             }
                         });
             }
